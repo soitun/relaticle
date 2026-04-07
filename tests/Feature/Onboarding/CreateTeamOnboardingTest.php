@@ -30,7 +30,7 @@ it('renders the create team page with wizard for teamless users', function (): v
 
     livewire(CreateTeam::class)
         ->assertSuccessful()
-        ->assertSee('Welcome to Relaticle');
+        ->assertSee('Create your workspace');
 });
 
 it('renders simple form for users who already have a team', function (): void {
@@ -40,8 +40,7 @@ it('renders simple form for users who already have a team', function (): void {
 
     livewire(CreateTeam::class)
         ->assertSuccessful()
-        ->assertSee('Create your workspace')
-        ->assertDontSee('Welcome to Relaticle');
+        ->assertSee('Create your workspace');
 });
 
 it('creates a team with onboarding fields', function (): void {
@@ -156,6 +155,7 @@ it('marks subsequent teams as non-personal', function (): void {
 
     livewire(CreateTeam::class)
         ->fillForm([
+            'onboarding_use_case' => OnboardingUseCase::Other->value,
             'name' => 'Second Team',
         ])
         ->call('register')
@@ -166,7 +166,7 @@ it('marks subsequent teams as non-personal', function (): void {
     expect($secondTeam->personal_team)->toBeFalse();
 });
 
-it('redirects first team to onboarding invite page', function (): void {
+it('redirects first team to companies index', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -178,7 +178,7 @@ it('redirects first team to onboarding invite page', function (): void {
         ])
         ->call('register')
         ->assertHasNoFormErrors()
-        ->assertRedirect(OnboardingInvite::getUrl(tenant: $user->fresh()->currentTeam));
+        ->assertRedirect(CompanyResource::getUrl('index', ['tenant' => $user->fresh()->currentTeam]));
 });
 
 it('redirects subsequent teams to companies index', function (): void {
@@ -188,6 +188,7 @@ it('redirects subsequent teams to companies index', function (): void {
 
     livewire(CreateTeam::class)
         ->fillForm([
+            'onboarding_use_case' => OnboardingUseCase::Other->value,
             'name' => 'Second Team',
         ])
         ->call('register')
@@ -418,13 +419,14 @@ it('seeds custom field values correctly for sales', function (): void {
         ->and($appleValues[$companyFields['linkedin']]->json_value)->toContain('https://www.linkedin.com/company/apple');
 });
 
-it('does not require onboarding fields for subsequent teams', function (): void {
+it('stores use case for subsequent teams', function (): void {
     $user = User::factory()->withPersonalTeam()->create();
 
     $this->actingAs($user);
 
     livewire(CreateTeam::class)
         ->fillForm([
+            'onboarding_use_case' => OnboardingUseCase::Marketing->value,
             'name' => 'Second Team',
         ])
         ->call('register')
@@ -433,7 +435,7 @@ it('does not require onboarding fields for subsequent teams', function (): void 
     $team = $user->fresh()->ownedTeams()->where('name', 'Second Team')->first();
 
     expect($team)->not->toBeNull()
-        ->and($team->onboarding_use_case)->toBeNull();
+        ->and($team->onboarding_use_case)->toBe(OnboardingUseCase::Marketing);
 });
 
 it('provides sub-options for each use case', function (): void {
@@ -532,7 +534,7 @@ it('renders the onboarding invite page for new teams', function (): void {
 
     livewire(OnboardingInvite::class)
         ->assertSuccessful()
-        ->assertSee('Invite your team to collaborate');
+        ->assertSee('Invite your teammates');
 });
 
 it('can skip the onboarding invite page', function (): void {

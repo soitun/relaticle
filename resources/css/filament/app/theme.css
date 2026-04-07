@@ -410,6 +410,19 @@
     @apply rounded-xl;
 }
 
+/* Onboarding Wizard - full-width footer buttons */
+.fi-simple-page .fi-sc-wizard:not(.fi-contained) .fi-sc-wizard-footer {
+    @apply flex-col-reverse gap-3 mt-8;
+
+    > div {
+        @apply w-full;
+
+        .fi-btn {
+            @apply w-full justify-center;
+        }
+    }
+}
+
 /* FlowForge Specific Customizations */
 .flowforge-column-header {
     @apply bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 rounded-t-xl;

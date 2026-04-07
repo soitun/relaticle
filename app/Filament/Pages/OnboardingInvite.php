@@ -11,11 +11,14 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Support\Enums\Width;
 use Illuminate\Validation\ValidationException;
 
 final class OnboardingInvite extends Page
 {
     protected string $view = 'filament.pages.onboarding-invite';
+
+    protected static string $layout = 'filament-panels::components.layout.simple';
 
     protected static ?string $slug = 'onboarding/invite';
 
@@ -37,14 +40,29 @@ final class OnboardingInvite extends Page
         }
     }
 
+    public function getMaxContentWidth(): Width
+    {
+        return Width::ExtraLarge;
+    }
+
     public function getTitle(): string
     {
-        return 'Collaborate with your team';
+        return 'Invite your teammates';
+    }
+
+    public function getHeading(): string
+    {
+        return 'Invite your teammates';
     }
 
     public function getSubheading(): string
     {
         return 'The more your teammates use Relaticle, the more powerful it becomes.';
+    }
+
+    public function hasLogo(): bool
+    {
+        return false;
     }
 
     public function addEmailField(): void
