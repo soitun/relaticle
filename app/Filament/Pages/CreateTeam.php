@@ -331,7 +331,11 @@ final class CreateTeam extends RegisterTenant
     #[Override]
     protected function getFormActions(): array
     {
-        return [];
+        if ($this->isFirstTeam()) {
+            return [];
+        }
+
+        return [$this->getRegisterFormAction()];
     }
 
     #[Override]
