@@ -45,6 +45,8 @@ final class NewSubscriberListener implements ShouldHandleEventsAfterCommit, Shou
                     'tags' => $tags,
                     'user_id' => (string) $user->id,
                 ])));
+
+                return;
             }
 
             dispatch(new CreateSubscriberJob(SubscriberData::from([
