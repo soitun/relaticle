@@ -419,15 +419,15 @@ it('seeds custom field values correctly for sales', function (): void {
         ->and($appleValues[$companyFields['linkedin']]->json_value)->toContain('https://www.linkedin.com/company/apple');
 });
 
-it('stores use case for subsequent teams', function (): void {
+it('subsequent teams use simple form without onboarding fields', function (): void {
     $user = User::factory()->withPersonalTeam()->create();
 
     $this->actingAs($user);
 
     livewire(CreateTeam::class)
         ->fillForm([
-            'onboarding_use_case' => OnboardingUseCase::Marketing->value,
             'name' => 'Second Team',
+            'slug' => 'second-team',
         ])
         ->call('register')
         ->assertHasNoFormErrors();
@@ -435,7 +435,8 @@ it('stores use case for subsequent teams', function (): void {
     $team = $user->fresh()->ownedTeams()->where('name', 'Second Team')->first();
 
     expect($team)->not->toBeNull()
-        ->and($team->onboarding_use_case)->toBe(OnboardingUseCase::Marketing);
+        ->and($team->onboarding_use_case)->toBeNull()
+        ->and($team->onboarding_referral_source)->toBeNull();
 });
 
 it('provides sub-options for each use case', function (): void {

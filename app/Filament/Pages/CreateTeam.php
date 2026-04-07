@@ -51,18 +51,30 @@ final class CreateTeam extends RegisterTenant
     #[Override]
     public function getHeading(): string
     {
-        return '';
+        if ($this->isFirstTeam()) {
+            return '';
+        }
+
+        return 'Create your workspace';
     }
 
     #[Override]
     public function getSubheading(): ?string
     {
-        return null;
+        if ($this->isFirstTeam()) {
+            return null;
+        }
+
+        return 'Choose a name for your team. This will also be used in your workspace URL.';
     }
 
     #[Override]
     public function form(Schema $schema): Schema
     {
+        if (! $this->isFirstTeam()) {
+            return $schema->components($this->getWorkspaceFormComponents());
+        }
+
         return $schema
             ->components([
                 Wizard::make([
