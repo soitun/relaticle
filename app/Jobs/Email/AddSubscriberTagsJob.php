@@ -10,11 +10,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Spatie\MailcoachSdk\Facades\Mailcoach;
 
 final class AddSubscriberTagsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 0;
 
     /**
      * @param  list<string>  $tags
@@ -38,5 +41,13 @@ final class AddSubscriberTagsJob implements ShouldQueue
     public function retryUntil(): \DateTime
     {
         return now()->addHour();
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::channel('email_subscriptions_channel')->error("Failed to add tags to subscriber {$this->subscriberUuid}", [
+            'tags' => $this->tags,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }

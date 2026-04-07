@@ -7,6 +7,7 @@ namespace App\Jobs\Email;
 use App\Data\SubscriberData;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,9 +17,11 @@ use Illuminate\Support\Facades\Log;
 use Spatie\MailcoachSdk\Facades\Mailcoach;
 use Spatie\MailcoachSdk\Resources\Subscriber;
 
-final class UpdateSubscriberJob implements ShouldQueue
+final class UpdateSubscriberJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 0;
 
     public function __construct(private readonly SubscriberData $data) {}
 
@@ -63,5 +66,12 @@ final class UpdateSubscriberJob implements ShouldQueue
     public function retryUntil(): \DateTime
     {
         return now()->addHour();
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::channel('email_subscriptions_channel')->error("Failed to update subscriber '{$this->data->email}'", [
+            'error' => $exception->getMessage(),
+        ]);
     }
 }

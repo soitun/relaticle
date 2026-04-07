@@ -63,7 +63,6 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar, Has
         'name',
         'email',
         'password',
-        'last_login_at',
     ];
 
     /**
@@ -76,6 +75,8 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar, Has
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
+        'mailcoach_subscriber_uuid',
+        'subscriber_recency_bucket',
     ];
 
     /**
