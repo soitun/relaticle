@@ -5,4 +5,4 @@ custom_fields:
   description: Prepare and send the final proposal for the Apple developer partnership.
   due_date: '{{ +5d }}'
   status: To do
-  priority: Medium 
+  priority: Medium
